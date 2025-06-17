@@ -1,0 +1,21 @@
+{
+  "name": "oil-price-calendar",
+  "version": "1.0.0",
+  "description": "油价日历订阅系统",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
+    "ical-generator": "^5.0.1",
+    "moment": "^2.29.4",
+    "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+} 
