@@ -4,8 +4,8 @@ const moment = require('moment-timezone');
 // 辅助函数：处理"24:00"时间，确保日历事件在指定日期的末尾，且带时区
 const parseICalDateTime = (dateString) => {
     if (dateString.includes('24:00')) {
-        // 将 'YYYY-MM-DD 24:00' 转换为 'YYYY-MM-DD 23:59:59'，并指定东八区
-        return moment.tz(dateString.replace('24:00', '23:59:59'), 'YYYY-MM-DD HH:mm:ss', 'Asia/Shanghai');
+        // 将 'YYYY-MM-DD 24:00' 转换为 'YYYY-MM-DD 16:00:00'，并指定东八区
+        return moment.tz(dateString.replace('24:00', '16:00:00'), 'YYYY-MM-DD HH:mm:ss', 'Asia/Shanghai');
     }
     // 对于其他标准格式，直接解析为东八区
     return moment.tz(dateString, 'YYYY-MM-DD HH:mm:ss', 'Asia/Shanghai');
@@ -50,12 +50,12 @@ function generateCalendar(futureDates, latestOilInfo) {
 
             } else {
                 // 后续事件（待预测）
-                summary = `油价调整预期：待预测 (时间：${dateEntry.date} 23:59:59)`; // 摘要中使用 23:59:59
-                description = `调整预期：待预测\n调整日期：${dateEntry.date} 23:59:59`; // 描述中使用 23:59:59
+                summary = `油价调整预期：待预测 (时间：${dateEntry.date} 16:00:00)`; // 摘要中使用 16:00:00
+                description = `调整预期：待预测\n调整日期：${dateEntry.date} 16:00:00`; // 描述中使用 16:00:00
                 
-                // 对于后续日期，我们假设它们也是在 24:00 调整，并使用 parseICalDateTime
-                eventStart = parseICalDateTime(`${dateEntry.date} 23:59:59`);
-                eventEnd = parseICalDateTime(`${dateEntry.date} 23:59:59`).add(1, 'hour');
+                // 对于后续日期，我们假设它们也是在 16:00 调整，并使用 parseICalDateTime
+                eventStart = parseICalDateTime(`${dateEntry.date} 16:00:00`);
+                eventEnd = parseICalDateTime(`${dateEntry.date} 16:00:00`).add(1, 'hour');
             }
 
             calendar.createEvent({
