@@ -68,11 +68,10 @@ app.get('/api/calendar/:userId', (req, res) => {
     if (data.adjustmentDates && Array.isArray(data.adjustmentDates)) {
         data.adjustmentDates.sort((a, b) => new Date(a.date) - new Date(b.date)); // 确保日期是升序的
         for (const dateEntry of data.adjustmentDates) {
-            const adjustmentDate = new Date(dateEntry.date);
-            // 将调整时间设置为当天的24点，确保当天结束前都算未来
-            adjustmentDate.setHours(24, 0, 0, 0);
+            const adjustmentMoment = moment(dateEntry.date).endOf('day'); // 考虑到24:00，将日期视为当天结束
+
             // 比较日期，过滤掉已经过去的日期
-            if (adjustmentDate > now) {
+            if (adjustmentMoment.isSameOrAfter(moment())) {
                 futureAdjustmentDates.push(dateEntry); // 收集所有未来的调整日期
             }
         }
