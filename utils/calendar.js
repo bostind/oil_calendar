@@ -1,14 +1,14 @@
 const ICal = require('ical-generator').default;
-const moment = require('moment');
+const moment = require('moment-timezone');
 
-// 辅助函数：处理"24:00"时间，确保日历事件在指定日期的末尾
+// 辅助函数：处理"24:00"时间，确保日历事件在指定日期的末尾，且带时区
 const parseICalDateTime = (dateString) => {
     if (dateString.includes('24:00')) {
-        // 将 'YYYY-MM-DD 24:00' 转换为 'YYYY-MM-DD 23:59:59'
-        return moment(dateString.replace('24:00', '23:59:59'));
+        // 将 'YYYY-MM-DD 24:00' 转换为 'YYYY-MM-DD 23:59:59'，并指定东八区
+        return moment.tz(dateString.replace('24:00', '23:59:59'), 'YYYY-MM-DD HH:mm:ss', 'Asia/Shanghai');
     }
-    // 对于其他标准格式，直接解析
-    return moment(dateString);
+    // 对于其他标准格式，直接解析为东八区
+    return moment.tz(dateString, 'YYYY-MM-DD HH:mm:ss', 'Asia/Shanghai');
 };
 
 // generateCalendar 现在接收一个未来日期的数组和最新的油价信息
@@ -21,12 +21,13 @@ function generateCalendar(futureDates, latestOilInfo) {
     if (futureDates.length === 0) {
         // 如果没有未来的调整日期，创建一个提示性事件
         calendar.createEvent({
-            start: parseICalDateTime(moment().format('YYYY-MM-DD HH:MM')),
-            end: parseICalDateTime(moment().add(1, 'hour').format('YYYY-MM-DD HH:MM')),
+            start: parseICalDateTime(moment().format('YYYY-MM-DD HH:mm:ss')),
+            end: parseICalDateTime(moment().add(1, 'hour').format('YYYY-MM-DD HH:mm:ss')),
             summary: '油价调整信息：暂无即将调整的油价信息',
             description: '目前没有预期的油价调整信息。\n您可以关注本页面获取最新油价信息。\n链接：https://example.com/oil-price',
             url: 'https://example.com/oil-price',
-            categories: [{ name: '油价调整' }]
+            categories: [{ name: '油价调整' }],
+            timezone: 'Asia/Shanghai'
         });
     } else {
         futureDates.forEach((dateEntry, index) => {
@@ -49,21 +50,22 @@ function generateCalendar(futureDates, latestOilInfo) {
 
             } else {
                 // 后续事件（待预测）
-                summary = `油价调整预期：待预测 (时间：${dateEntry.date} 24:00)`; // 摘要中明确 24:00
-                description = `调整预期：待预测\n调整日期：${dateEntry.date} 24:00`; // 描述中明确 24:00
+                summary = `油价调整预期：待预测 (时间：${dateEntry.date} 23:59:59)`; // 摘要中使用 23:59:59
+                description = `调整预期：待预测\n调整日期：${dateEntry.date} 23:59:59`; // 描述中使用 23:59:59
                 
                 // 对于后续日期，我们假设它们也是在 24:00 调整，并使用 parseICalDateTime
-                eventStart = parseICalDateTime(`${dateEntry.date} 24:00`);
-                eventEnd = parseICalDateTime(`${dateEntry.date} 24:00`).add(1, 'hour');
+                eventStart = parseICalDateTime(`${dateEntry.date} 23:59:59`);
+                eventEnd = parseICalDateTime(`${dateEntry.date} 23:59:59`).add(1, 'hour');
             }
 
             calendar.createEvent({
                 start: eventStart,
                 end: eventEnd,
-                summary: summary,
-                description: description,
+                summary,
+                description,
                 url: 'https://example.com/oil-price',
-                categories: [{ name: '油价调整' }]
+                categories: [{ name: '油价调整' }],
+                timezone: 'Asia/Shanghai'
             });
         });
     }
