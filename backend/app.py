@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import requests
 from bs4 import BeautifulSoup
@@ -53,7 +54,7 @@ def parse_oil_info(text):
         month = int(time_match.group(1))
         day = int(time_match.group(2))
         hour = int(time_match.group(3))
-        date_str = f"{year}-{month:02d}-{day:02d} {hour:02d}:00"
+        date_str = "{}-{:02d}-{:02d} {:02d}:00".format(year, month, day, hour)
     else:
         date_str = datetime.now().strftime('%Y-%m-%d %H:%M')
     # 匹配涨跌
