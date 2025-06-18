@@ -22,6 +22,24 @@ const getOilPriceData = () => {
     return JSON.parse(fs.readFileSync('tzrq.json', 'utf8'));
 };
 
+// 读取搜索结果
+const getSearchResults = () => {
+    try {
+        return JSON.parse(fs.readFileSync('search_results.json', 'utf8'));
+    } catch (error) {
+        return {
+            lastUpdate: null,
+            lastTrend: null,
+            lastAmount: null,
+            lastTypes: [],
+            lastSource: null,
+            lastNews: null,
+            lastNewsUrl: null,
+            newsHistory: []
+        };
+    }
+};
+
 // 用户订阅数据存储
 const subscribers = new Map();
 
@@ -37,8 +55,12 @@ app.get('/admin', (req, res) => {
 
 // 获取油价调整时间表和最新信息
 app.get('/api/dates', (req, res) => {
-    const data = getOilPriceData();
-    res.json(data);
+    const oilPriceData = getOilPriceData();
+    const searchResults = getSearchResults();
+    res.json({
+        ...oilPriceData,
+        ...searchResults
+    });
 });
 
 // 订阅日历
@@ -59,15 +81,16 @@ app.get('/api/calendar/:userId', (req, res) => {
         return res.status(404).send('订阅不存在');
     }
     
-    const data = getOilPriceData();
+    const oilPriceData = getOilPriceData();
+    const searchResults = getSearchResults();
     const now = new Date();
 
     // 找到所有未来的调整日期
     let futureAdjustmentDates = [];
     // 确保 adjustmentDates 存在且是数组，然后进行排序
-    if (data.adjustmentDates && Array.isArray(data.adjustmentDates)) {
-        data.adjustmentDates.sort((a, b) => new Date(a.date) - new Date(b.date)); // 确保日期是升序的
-        for (const dateEntry of data.adjustmentDates) {
+    if (oilPriceData.adjustmentDates && Array.isArray(oilPriceData.adjustmentDates)) {
+        oilPriceData.adjustmentDates.sort((a, b) => new Date(a.date) - new Date(b.date)); // 确保日期是升序的
+        for (const dateEntry of oilPriceData.adjustmentDates) {
             const adjustmentMoment = moment(dateEntry.date).endOf('day'); // 考虑到24:00，将日期视为当天结束
 
             // 比较日期，过滤掉已经过去的日期
@@ -78,9 +101,9 @@ app.get('/api/calendar/:userId', (req, res) => {
     }
 
     const calendar = generateCalendar(futureAdjustmentDates, { 
-        lastUpdate: data.lastUpdate,
-        lastTrend: data.lastTrend,
-        lastAmount: data.lastAmount
+        lastUpdate: searchResults.lastUpdate,
+        lastTrend: searchResults.lastTrend,
+        lastAmount: searchResults.lastAmount
     });
     
     res.set('Content-Type', 'text/calendar');
@@ -90,17 +113,12 @@ app.get('/api/calendar/:userId', (req, res) => {
 
 // 获取订阅统计
 app.get('/api/stats', (req, res) => {
-    const data = getOilPriceData();
+    const oilPriceData = getOilPriceData();
+    const searchResults = getSearchResults();
     res.json({
         subscriberCount: subscribers.size,
-        dates: data.adjustmentDates,
-        lastUpdate: data.lastUpdate,
-        lastTrend: data.lastTrend,
-        lastAmount: data.lastAmount,
-        lastTypes: data.lastTypes,
-        lastSource: data.lastSource,
-        lastNews: data.lastNews,
-        lastNewsUrl: data.lastNewsUrl
+        dates: oilPriceData.adjustmentDates,
+        ...searchResults
     });
 });
 

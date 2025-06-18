@@ -76,53 +76,6 @@
             "date": "2025-12-22 24:00"
         }
     ],
-    "lastUpdate": "2025-06-17 24:00",
     "version": "1.0",
-    "description": "油价调整时间表，每10个工作日调整一次",
-    "lastTrend": "up",
-    "lastAmount": 0.2,
-    "lastTypes": [
-        "0"
-    ],
-    "lastSource": "Bing搜索",
-    "lastNews": "cngold.orghttps://energy.cngold.org油价调整最新消息：今日 (6月17日)油价预计上调0.20元/升 ...2025年历史油价调整一览 日期 油价调整信息 06月17日24时 汽、柴油价格分别上调260、255元/吨 06月03日24时 汽、柴油价格分别上调65、60元/吨 05月19日24时 汽、柴油价格分别下调230 …",
-    "lastNewsUrl": "https://www.bing.com/search?q=%E6%B2%B9%E4%BB%B7%E8%B0%83%E6%95%B4",
-    "newsHistory": [
-        {
-            "date": "2025-06-17 24:00",
-            "title": "cngold.orghttps://energy.cngold.org油价调整最新消息：今日 (6月17日)油价预计上调0.20元/升 ...2025年历史油价调整一览 日期 油价调整信息 06月17日24时 汽、柴油价格分别上调260、255元/吨 06月03日24时 汽、柴油价格分别上调65、60元/吨 05月19日24时 汽、柴油价格分别下调230 …",
-            "source": "Bing搜索",
-            "url": "https://www.bing.com/search?q=%E6%B2%B9%E4%BB%B7%E8%B0%83%E6%95%B4",
-            "trend": "up",
-            "amount": 0.2,
-            "types": [
-                "0"
-            ],
-            "score": 10
-        },
-        {
-            "date": "2025-06-17 24:00",
-            "title": "cngold.orghttps://energy.cngold.org油价调整最新消息：今日 (6月17日)油价预计上调0.20元/升 ...2025年历史油价调整一览 日期 油价调整信息 06月17日24时 汽、柴油价格分别上调260、255元/吨 06月03日24时 汽、柴油价格分别上调65、60元/吨 05月19日24时 汽、柴油价格分别下调230 …",
-            "source": "Bing搜索",
-            "url": "https://www.bing.com/search?q=%E6%B2%B9%E4%BB%B7%E8%B0%83%E6%95%B4",
-            "trend": "up",
-            "amount": 0.2,
-            "types": [
-                "0"
-            ],
-            "score": 10
-        },
-        {
-            "date": "2025-06-17 24:00",
-            "title": "cngold.orghttps://energy.cngold.org油价调整最新消息：今日 (6月17日)油价预计上调0.20元/升 ...2025年历史油价调整一览 日期 油价调整信息 06月17日24时 汽、柴油价格分别上调260、255元/吨 06月03日24时 汽、柴油价格分别上调65、60元/吨 05月19日24时 汽、柴油价格分别下调230 …",
-            "source": "Bing搜索",
-            "url": "https://www.bing.com/search?q=%E6%B2%B9%E4%BB%B7%E8%B0%83%E6%95%B4",
-            "trend": "up",
-            "amount": 0.2,
-            "types": [
-                "0"
-            ],
-            "score": 10
-        }
-    ]
+    "description": "油价调整时间表，每10个工作日调整一次"
 }

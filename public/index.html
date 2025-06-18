@@ -112,7 +112,32 @@
                     
                     latestInfoDiv.innerHTML = html;
                 } else {
-                    latestInfoDiv.innerHTML = '<p class="text-muted">暂无最新油价调整信息</p>';
+                    // 查找下一个调整日期
+                    let nextDate = null;
+                    const now = new Date();
+                    if (data.adjustmentDates && data.adjustmentDates.length > 0) {
+                        // 排序，找到第一个大于当前时间的日期
+                        const sorted = data.adjustmentDates
+                            .map(d => {
+                                if (d.date.includes('24:00')) {
+                                    const [datePart] = d.date.split(' ');
+                                    const [year, month, day] = datePart.split('-');
+                                    return {raw: d.date, date: new Date(year, month - 1, parseInt(day) + 1, 0, 0, 0)};
+                                } else {
+                                    return {raw: d.date, date: new Date(d.date)};
+                                }
+                            })
+                            .filter(d => d.date > now)
+                            .sort((a, b) => a.date - b.date);
+                        if (sorted.length > 0) {
+                            nextDate = sorted[0].raw;
+                        }
+                    }
+                    if (nextDate) {
+                        latestInfoDiv.innerHTML = `<p class="text-muted">下次调整时间：${nextDate}，待预测</p>`;
+                    } else {
+                        latestInfoDiv.innerHTML = '<p class="text-muted">暂无未来油价调整日期</p>';
+                    }
                 }
             } catch (error) {
                 console.error('获取最新油价信息失败:', error);
@@ -134,33 +159,39 @@
                 data.adjustmentDates.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 data.adjustmentDates.forEach(dateEntry => {
-                    const adjustmentDate = new Date(dateEntry.date);
-                    adjustmentDate.setHours(24, 0, 0, 0); // 将时间设置为调整日的24点
-                    now.setHours(0, 0, 0, 0); // 将当前时间设置为今天的0点，只比较日期
+    // 处理24:00的情况，将其转换为次日的00:00
+    let adjustmentDate;
+    if (dateEntry.date.includes('24:00')) {
+        const [datePart] = dateEntry.date.split(' ');
+        const [year, month, day] = datePart.split('-');
+        adjustmentDate = new Date(year, month - 1, parseInt(day) + 1, 0, 0, 0);
+    } else {
+        adjustmentDate = new Date(dateEntry.date);
+    }
 
-                    if (adjustmentDate > now) { // 只显示未来的日期
-                        hasFutureDates = true;
-                        const diffMs = adjustmentDate - new Date(); // 重新获取精确的当前时间，计算准确差值
-                        const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
-                        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (adjustmentDate > now) { // 只显示未来的日期
+        hasFutureDates = true;
+        const diffMs = adjustmentDate - new Date(); // 重新获取精确的当前时间，计算准确差值
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-                        let countdownText = '';
-                        if (diffHours <= 24) {
-                            countdownText = `${diffHours}小时后`;
-                        } else {
-                            countdownText = `${diffDays}天后`;
-                        }
+        let countdownText = '';
+        if (diffHours <= 24) {
+            countdownText = `${diffHours}小时后`;
+        } else {
+            countdownText = `${diffDays}天后`;
+        }
 
-                        html += `
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0">${dateEntry.date}</h6>
-                                    <span class="badge bg-primary">${countdownText}</span>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
+        html += `
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">${dateEntry.date}</h6>
+                    <span class="badge bg-primary">${countdownText}</span>
+                </div>
+            </div>
+        `;
+    }
+});
                 html += '</div>';
                 
                 if (!hasFutureDates) {
