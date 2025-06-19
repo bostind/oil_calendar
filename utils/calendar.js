@@ -41,29 +41,33 @@ function generateCalendar(futureDates, latestOilInfo) {
         futureDates.forEach((dateEntry, index) => {
             let summary;
             let description;
-            // 只保留原始字段
+            const eventStart = parseICalDateTime(`${dateEntry.date} 16:00:00`);
+            const eventEnd = parseICalDateTime(`${dateEntry.date} 16:00:00`).add(1, 'hour');
             const dateOrigin = dateEntry.date;
 
-            if (index === 0 && latestOilInfo.lastTrend) {
-                // 第一个事件描述包含最新趋势和新闻
-                const trendText = getTrendText(latestOilInfo.lastTrend);
-                const adjustmentExpected = `${trendText}${latestOilInfo.lastAmount ? ' ' + latestOilInfo.lastAmount : ''}`;
-                summary = `油价调整预期：${adjustmentExpected}`;
-                description = `调整预期：${adjustmentExpected}\n调整日期：${dateOrigin}`;
-                if (latestOilInfo.lastNews) {
-                    description += `\n新闻摘要：${latestOilInfo.lastNews}`;
-                }
-                if (latestOilInfo.lastNewsUrl) {
-                    description += `\n新闻链接：${latestOilInfo.lastNewsUrl}`;
-                }
-            } else {
-                summary = `油价调整预期：待预测 (时间：${dateOrigin})`;
-                description = `调整预期：待预测\n调整日期：${dateOrigin}`;
+            // 判断是否为手动设置
+            let isManual = false;
+            let trend = latestOilInfo.lastTrend;
+            let amount = latestOilInfo.lastAmount;
+            let newsUrl = latestOilInfo.lastNewsUrl;
+            if (latestOilInfo.manualTrend && latestOilInfo.manualUpdate === dateOrigin) {
+                isManual = true;
+                trend = latestOilInfo.manualTrend;
+                amount = latestOilInfo.manualAmount;
+                newsUrl = null;
             }
-
+            const trendText = getTrendText(trend);
+            const adjustmentExpected = `${trendText}${amount ? ' ' + amount : ''}`;
+            summary = `油价调整预期：${adjustmentExpected}`;
+            description = `调整预期：${adjustmentExpected}\n调整日期：${dateOrigin}`;
+            if (isManual) {
+                description += `\n来源：手动设置`;
+            } else if (newsUrl) {
+                description += `\n来源：查看详细 ${newsUrl}`;
+            }
             calendar.createEvent({
-                start: parseICalDateTime(`${dateOrigin} 16:00:00`),
-                end: parseICalDateTime(`${dateOrigin} 16:00:00`).add(1, 'hour'),
+                start: eventStart,
+                end: eventEnd,
                 summary,
                 description,
                 url: 'https://example.com/oil-price',
