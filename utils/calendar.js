@@ -53,11 +53,7 @@ function generateCalendar(futureDates, latestOilInfo) {
         const trendText = getTrendText(trend);
         const adjustmentExpected = `${trendText}${amount ? ' ' + amount : ''}`;
         let description = `调整预期：${adjustmentExpected}\n调整日期：${dateOrigin}`;
-        if (isManual) {
-            description += `\n来源：手动设置`;
-        } else if (newsUrl) {
-            description += `\n来源：查看详细 ${newsUrl}`;
-        }
+        
         calendar.createEvent({
             start: parseICalDateTime(`${dateOrigin} 16:00:00`),
             end: parseICalDateTime(`${dateOrigin} 16:00:00`).add(1, 'hour'),
