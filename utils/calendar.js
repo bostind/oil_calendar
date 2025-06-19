@@ -59,7 +59,7 @@ function generateCalendar(futureDates, latestOilInfo) {
             end: parseICalDateTime(`${dateOrigin} 16:00:00`).add(1, 'hour'),
             summary: `油价调整预期：${adjustmentExpected}`,
             description,
-            url: 'https://example.com/oil-price',
+            //url: 'https://example.com/oil-price',
             categories: [{ name: '油价调整' }],
             timezone: 'Asia/Shanghai'
         });
@@ -71,7 +71,7 @@ function generateCalendar(futureDates, latestOilInfo) {
                 end: parseICalDateTime(`${d.date} 16:00:00`).add(1, 'hour'),
                 summary: `油价调整预期：待预测`,
                 description: `调整预期：待预测\n调整日期：${d.date}`,
-                url: 'https://example.com/oil-price',
+                //url: 'https://example.com/oil-price',
                 categories: [{ name: '油价调整' }],
                 timezone: 'Asia/Shanghai'
             });
