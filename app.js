@@ -35,9 +35,17 @@ const getSearchResults = () => {
             lastSource: null,
             lastNews: null,
             lastNewsUrl: null,
+            manualTrend: null,
+            manualAmount: null,
+            manualUpdate: null,
             newsHistory: []
         };
     }
+};
+
+// 保存搜索结果
+const saveSearchResults = (data) => {
+    fs.writeFileSync('search_results.json', JSON.stringify(data, null, 4));
 };
 
 // 用户订阅数据存储
@@ -124,17 +132,18 @@ app.get('/api/stats', (req, res) => {
 
 // 更新油价趋势 (管理界面手动更新)
 app.post('/api/update-trend', (req, res) => {
-    const { date, trend } = req.body;
-    let data = getOilPriceData();
-    // 找到对应的日期并更新趋势
-    const targetDate = data.adjustmentDates.find(d => d.date === date);
-    if (targetDate) {
-        targetDate.trend = trend; // 添加或更新趋势字段
-    }
-    data.lastUpdate = moment().format('YYYY-MM-DD'); // 假设手动更新也更新最新时间
-    data.lastTrend = trend; // 更新最新趋势
+    const { date, trend, amount } = req.body;
+    let searchData = getSearchResults();
 
-    fs.writeFileSync('tzrq.json', JSON.stringify(data, null, 4));
+    // 写入手动调整信息到 search_results.json
+    searchData.manualTrend = trend;
+    searchData.manualAmount = amount || null;
+    searchData.manualUpdate = date;
+    searchData.lastUpdate = moment().format('YYYY-MM-DD HH:mm');
+    searchData.lastTrend = trend;
+    searchData.lastAmount = amount || null;
+
+    saveSearchResults(searchData);
     res.json({ success: true });
 });
 

@@ -11,6 +11,8 @@ app = Flask(__name__)
 
 # tzrq.json 文件路径 (相对于 backend/app.py)
 TZRQ_JSON_PATH = os.path.join(os.path.dirname(__file__), '..', 'tzrq.json')
+# search_results.json 文件路径
+SEARCH_RESULTS_PATH = os.path.join(os.path.dirname(__file__), '..', 'search_results.json')
 
 # 读取油价调整数据
 def get_oil_price_data():
@@ -18,9 +20,8 @@ def get_oil_price_data():
         # 如果文件不存在，创建一个空的或者默认的结构
         initial_data = {
             "adjustmentDates": [],
-            "lastUpdate": "",
             "version": "1.0",
-            "description": "油价调整时间表"
+            "description": "油价调整时间表，每10个工作日调整一次"
         }
         with open(TZRQ_JSON_PATH, 'w', encoding='utf-8') as f:
             json.dump(initial_data, f, ensure_ascii=False, indent=4)
@@ -30,6 +31,33 @@ def get_oil_price_data():
 # 保存油价调整数据
 def save_oil_price_data(data):
     with open(TZRQ_JSON_PATH, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+# 读取搜索结果数据
+def get_search_results():
+    if not os.path.exists(SEARCH_RESULTS_PATH):
+        # 如果文件不存在，创建一个空的或者默认的结构
+        initial_data = {
+            "lastUpdate": None,
+            "lastTrend": None,
+            "lastAmount": None,
+            "lastTypes": [],
+            "lastSource": None,
+            "lastNews": None,
+            "lastNewsUrl": None,
+            "manualTrend": None,
+            "manualAmount": None,
+            "manualUpdate": None,
+            "newsHistory": []
+        }
+        with open(SEARCH_RESULTS_PATH, 'w', encoding='utf-8') as f:
+            json.dump(initial_data, f, ensure_ascii=False, indent=4)
+    with open(SEARCH_RESULTS_PATH, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+# 保存搜索结果数据
+def save_search_results(data):
+    with open(SEARCH_RESULTS_PATH, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
 # 配置请求头，模拟浏览器访问
@@ -136,8 +164,9 @@ def fetch_oil_price_api():
         if not result:
             print('未能获取到有效的油价调整信息')
             return jsonify({'status': 'error', 'message': '未能获取到有效的油价调整信息'}), 500
-        # 写入 tzrq.json
-        data = get_oil_price_data()
+        
+        # 写入 search_results.json
+        data = get_search_results()
         data['lastUpdate'] = result['date']
         data['lastTrend'] = result['trend']
         data['lastAmount'] = result['amount']
@@ -158,7 +187,7 @@ def fetch_oil_price_api():
             'score': 10
         })
         data['newsHistory'] = data['newsHistory'][:30]
-        save_oil_price_data(data)
+        save_search_results(data)
         return jsonify({'status': 'success', **result})
     except Exception as e:
         print(f'获取油价信息失败: {e}')

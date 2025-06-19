@@ -41,6 +41,7 @@
         .news-item:last-child {
             border-bottom: none;
         }
+        .trend-stranded { color: #888; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -89,29 +90,45 @@
                 const data = await response.json();
                 const latestInfoDiv = document.getElementById('latestPriceInfo');
                 
-                if (data.lastUpdate && data.lastTrend) {
-                    const trendClass = data.lastTrend === 'up' ? 'trend-up' : 'trend-down';
-                    const trendText = data.lastTrend === 'up' ? '上涨' : '下跌';
-                    
-                    let html = `
-                        <div class="card">
-                            <div class="card-body">
-                                <p class="card-text">调整时间：${data.lastUpdate}</p>
-                                <p class="card-text">调整预期：<span class="${trendClass}">${trendText}</span> ${data.lastAmount ? `<span class="price-amount">${data.lastAmount}元</span>` : ''}</p>
-                                ${data.lastNewsUrl ? `
-                                    <p class="card-text mt-3 news-source">
-                                        来源：${data.lastSource || '未知'}
-                                        <a href="${data.lastNewsUrl}" target="_blank" class="btn btn-sm btn-outline-primary ms-2">
-                                            查看详情
-                                        </a>
-                                    </p>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                    
-                    latestInfoDiv.innerHTML = html;
-                } else {
+                const trend = data.manualTrend || data.lastTrend;
+const amount = data.manualAmount || data.lastAmount;
+const updateTime = data.manualUpdate || data.lastUpdate;
+const source = data.manualTrend ? '手动设置' : (data.lastSource || '未知');
+const newsUrl = data.manualTrend ? '' : (data.lastNewsUrl || '');
+
+if (updateTime && trend) {
+    let trendClass, trendText;
+if (trend === 'up') {
+    trendClass = 'trend-up';
+    trendText = '上涨';
+} else if (trend === 'down') {
+    trendClass = 'trend-down';
+    trendText = '下跌';
+} else if (trend === 'stranded') {
+    trendClass = 'trend-stranded';
+    trendText = '搁浅';
+} else {
+    trendClass = '';
+    trendText = trend || '';
+}
+    let html = `
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text">调整时间：${updateTime}</p>
+                <p class="card-text">调整预期：<span class="${trendClass}">${trendText}</span> ${amount ? `<span class="price-amount">${amount}元</span>` : ''}</p>
+                ${newsUrl ? `
+                    <p class="card-text mt-3 news-source">
+                        来源：${source}
+                        <a href="${newsUrl}" target="_blank" class="btn btn-sm btn-outline-primary ms-2">
+                            查看详情
+                        </a>
+                    </p>
+                ` : `<p class="card-text mt-3 news-source">来源：${source}</p>`}
+            </div>
+        </div>
+    `;
+    latestInfoDiv.innerHTML = html;
+} else {
                     // 查找下一个调整日期
                     let nextDate = null;
                     const now = new Date();
