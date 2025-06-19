@@ -95,15 +95,12 @@ app.get('/api/calendar/:userId', (req, res) => {
 
     // 找到所有未来的调整日期
     let futureAdjustmentDates = [];
-    // 确保 adjustmentDates 存在且是数组，然后进行排序
     if (oilPriceData.adjustmentDates && Array.isArray(oilPriceData.adjustmentDates)) {
-        oilPriceData.adjustmentDates.sort((a, b) => new Date(a.date) - new Date(b.date)); // 确保日期是升序的
+        oilPriceData.adjustmentDates.sort((a, b) => new Date(a.date) - new Date(b.date));
         for (const dateEntry of oilPriceData.adjustmentDates) {
-            const adjustmentMoment = moment(dateEntry.date).endOf('day'); // 考虑到24:00，将日期视为当天结束
-
-            // 比较日期，过滤掉已经过去的日期
+            const adjustmentMoment = moment(dateEntry.date).endOf('day');
             if (adjustmentMoment.isSameOrAfter(moment())) {
-                futureAdjustmentDates.push(dateEntry); // 收集所有未来的调整日期
+                futureAdjustmentDates.push(dateEntry);
             }
         }
     }
@@ -111,8 +108,23 @@ app.get('/api/calendar/:userId', (req, res) => {
     const calendar = generateCalendar(futureAdjustmentDates, { 
         lastUpdate: searchResults.lastUpdate,
         lastTrend: searchResults.lastTrend,
-        lastAmount: searchResults.lastAmount
+        lastAmount: searchResults.lastAmount,
+        lastNews: searchResults.lastNews,
+        lastNewsUrl: searchResults.lastNewsUrl
     });
+
+    // log输出最近一次订阅内容（第一个事件）
+    try {
+        const events = calendar.events();
+        if (events && events.length > 0) {
+            const first = events[0];
+            console.log('最近一次订阅内容：');
+            console.log('summary:', first.summary());
+            console.log('description:', first.description());
+        }
+    } catch (e) {
+        console.error('打印订阅内容失败:', e);
+    }
     
     res.set('Content-Type', 'text/calendar');
     res.set('Content-Disposition', `attachment; filename="oil-price-calendar.ics"`);

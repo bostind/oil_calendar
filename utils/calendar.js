@@ -11,6 +11,14 @@ const parseICalDateTime = (dateString) => {
     return moment.tz(dateString, 'YYYY-MM-DD HH:mm:ss', 'Asia/Shanghai');
 };
 
+// 新增：趋势转中文
+function getTrendText(trend) {
+    if (trend === 'up') return '上涨';
+    if (trend === 'down') return '下跌';
+    if (trend === 'stranded') return '搁浅';
+    return trend || '待预测';
+}
+
 // generateCalendar 现在接收一个未来日期的数组和最新的油价信息
 function generateCalendar(futureDates, latestOilInfo) {
     const calendar = new ICal({
@@ -33,16 +41,15 @@ function generateCalendar(futureDates, latestOilInfo) {
         futureDates.forEach((dateEntry, index) => {
             let summary;
             let description;
-            // 事件时间严格用tzrq.json的dateEntry.date
-            const eventStart = parseICalDateTime(`${dateEntry.date} 16:00:00`);
-            const eventEnd = parseICalDateTime(`${dateEntry.date} 16:00:00`).add(1, 'hour');
+            // 只保留原始字段
+            const dateOrigin = dateEntry.date;
 
             if (index === 0 && latestOilInfo.lastTrend) {
                 // 第一个事件描述包含最新趋势和新闻
-                const trendText = latestOilInfo.lastTrend === 'up' ? '上涨' : (latestOilInfo.lastTrend === 'down' ? '下跌' : latestOilInfo.lastTrend);
-                const adjustmentExpected = `${trendText} ${latestOilInfo.lastAmount || ''}`;
+                const trendText = getTrendText(latestOilInfo.lastTrend);
+                const adjustmentExpected = `${trendText}${latestOilInfo.lastAmount ? ' ' + latestOilInfo.lastAmount : ''}`;
                 summary = `油价调整预期：${adjustmentExpected}`;
-                description = `调整预期：${adjustmentExpected}\n调整日期：${dateEntry.date} 16:00:00`;
+                description = `调整预期：${adjustmentExpected}\n调整日期：${dateOrigin}`;
                 if (latestOilInfo.lastNews) {
                     description += `\n新闻摘要：${latestOilInfo.lastNews}`;
                 }
@@ -50,13 +57,13 @@ function generateCalendar(futureDates, latestOilInfo) {
                     description += `\n新闻链接：${latestOilInfo.lastNewsUrl}`;
                 }
             } else {
-                summary = `油价调整预期：待预测 (时间：${dateEntry.date} 16:00:00)`;
-                description = `调整预期：待预测\n调整日期：${dateEntry.date} 16:00:00`;
+                summary = `油价调整预期：待预测 (时间：${dateOrigin})`;
+                description = `调整预期：待预测\n调整日期：${dateOrigin}`;
             }
 
             calendar.createEvent({
-                start: eventStart,
-                end: eventEnd,
+                start: parseICalDateTime(`${dateOrigin} 16:00:00`),
+                end: parseICalDateTime(`${dateOrigin} 16:00:00`).add(1, 'hour'),
                 summary,
                 description,
                 url: 'https://example.com/oil-price',

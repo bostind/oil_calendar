@@ -1,18 +1,29 @@
 {
-    "lastUpdate": "2025-06-19 08:57",
+    "lastUpdate": "2025-06-19 15:00",
     "lastTrend": "up",
     "lastAmount": null,
     "lastTypes": [
-        "92",
         "0"
     ],
     "lastSource": "Bing搜索",
-    "lastNews": "sina.com.cnhttps://finance.sina.com.cn › roll › doc-infamenx...油价又要变了！今晚12时调整，加满一箱92号汽油多花10.5元2 天之前 · 南国早报全媒体记者：黄婧 根据国内成品油调价机制，新一轮油价调整窗口将开启。6月17日，国家发展改革委决定自当天24时起上调国内成品油价格 ...",
+    "lastNews": "qq.comhttps://news.qq.com › rain油价大降近600元/吨，2025年“次新低”后显著上涨，6月17日调价4 天之前 · 大家好，国内油价以10个交易日为周期，今天是2025年6月15日，按照油价调整安排，本月2次油价调整，时间分别为6月3日以及6月17日。当前，国内各地 ...",
     "lastNewsUrl": "https://www.bing.com/search?q=%E6%B2%B9%E4%BB%B7%E8%B0%83%E6%95%B4",
     "manualTrend": "down",
     "manualAmount": null,
     "manualUpdate": "2025-07-01 24:00",
     "newsHistory": [
+        {
+            "date": "2025-06-19 15:00",
+            "title": "qq.comhttps://news.qq.com › rain油价大降近600元/吨，2025年“次新低”后显著上涨，6月17日调价4 天之前 · 大家好，国内油价以10个交易日为周期，今天是2025年6月15日，按照油价调整安排，本月2次油价调整，时间分别为6月3日以及6月17日。当前，国内各地 ...",
+            "source": "Bing搜索",
+            "url": "https://www.bing.com/search?q=%E6%B2%B9%E4%BB%B7%E8%B0%83%E6%95%B4",
+            "trend": "up",
+            "amount": null,
+            "types": [
+                "0"
+            ],
+            "score": 10
+        },
         {
             "date": "2025-06-19 08:57",
             "title": "sina.com.cnhttps://finance.sina.com.cn › roll › doc-infamenx...油价又要变了！今晚12时调整，加满一箱92号汽油多花10.5元2 天之前 · 南国早报全媒体记者：黄婧 根据国内成品油调价机制，新一轮油价调整窗口将开启。6月17日，国家发展改革委决定自当天24时起上调国内成品油价格 ...",
