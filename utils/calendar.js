@@ -33,29 +33,25 @@ function generateCalendar(futureDates, latestOilInfo) {
         futureDates.forEach((dateEntry, index) => {
             let summary;
             let description;
-            let eventStart;
-            let eventEnd;
+            // 事件时间严格用tzrq.json的dateEntry.date
+            const eventStart = parseICalDateTime(`${dateEntry.date} 16:00:00`);
+            const eventEnd = parseICalDateTime(`${dateEntry.date} 16:00:00`).add(1, 'hour');
 
             if (index === 0 && latestOilInfo.lastTrend) {
-                // 第一个事件（最近的未来调整），使用详细的预期信息
-                const trendText = latestOilInfo.lastTrend === 'up' ? '上涨' : '下跌';
-                const adjustmentExpected = `${trendText} ${latestOilInfo.lastAmount || 0}元`;
-
+                // 第一个事件描述包含最新趋势和新闻
+                const trendText = latestOilInfo.lastTrend === 'up' ? '上涨' : (latestOilInfo.lastTrend === 'down' ? '下跌' : latestOilInfo.lastTrend);
+                const adjustmentExpected = `${trendText} ${latestOilInfo.lastAmount || ''}`;
                 summary = `油价调整预期：${adjustmentExpected}`;
-                description = `调整预期：${adjustmentExpected}\n时间：${latestOilInfo.lastUpdate}`; // 描述中保留原始的 24:00
-
-                // 使用 parseICalDateTime 来设置日历事件的实际时间
-                eventStart = parseICalDateTime(latestOilInfo.lastUpdate);
-                eventEnd = parseICalDateTime(latestOilInfo.lastUpdate).add(1, 'hour');
-
+                description = `调整预期：${adjustmentExpected}\n调整日期：${dateEntry.date} 16:00:00`;
+                if (latestOilInfo.lastNews) {
+                    description += `\n新闻摘要：${latestOilInfo.lastNews}`;
+                }
+                if (latestOilInfo.lastNewsUrl) {
+                    description += `\n新闻链接：${latestOilInfo.lastNewsUrl}`;
+                }
             } else {
-                // 后续事件（待预测）
-                summary = `油价调整预期：待预测 (时间：${dateEntry.date} 16:00:00)`; // 摘要中使用 16:00:00
-                description = `调整预期：待预测\n调整日期：${dateEntry.date} 16:00:00`; // 描述中使用 16:00:00
-                
-                // 对于后续日期，我们假设它们也是在 16:00 调整，并使用 parseICalDateTime
-                eventStart = parseICalDateTime(`${dateEntry.date} 16:00:00`);
-                eventEnd = parseICalDateTime(`${dateEntry.date} 16:00:00`).add(1, 'hour');
+                summary = `油价调整预期：待预测 (时间：${dateEntry.date} 16:00:00)`;
+                description = `调整预期：待预测\n调整日期：${dateEntry.date} 16:00:00`;
             }
 
             calendar.createEvent({
