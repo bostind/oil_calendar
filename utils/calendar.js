@@ -27,7 +27,6 @@ function generateCalendar(futureDates, latestOilInfo) {
     });
 
     if (futureDates.length === 0) {
-        // 如果没有未来的调整日期，创建一个提示性事件
         calendar.createEvent({
             start: parseICalDateTime(moment().format('YYYY-MM-DD HH:mm:ss')),
             end: parseICalDateTime(moment().add(1, 'hour').format('YYYY-MM-DD HH:mm:ss')),
@@ -38,45 +37,50 @@ function generateCalendar(futureDates, latestOilInfo) {
             timezone: 'Asia/Shanghai'
         });
     } else {
-        futureDates.forEach((dateEntry, index) => {
-            let summary;
-            let description;
-            const eventStart = parseICalDateTime(`${dateEntry.date} 16:00:00`);
-            const eventEnd = parseICalDateTime(`${dateEntry.date} 16:00:00`).add(1, 'hour');
-            const dateOrigin = dateEntry.date;
-
-            // 判断是否为手动设置
-            let isManual = false;
-            let trend = latestOilInfo.lastTrend;
-            let amount = latestOilInfo.lastAmount;
-            let newsUrl = latestOilInfo.lastNewsUrl;
-            if (latestOilInfo.manualTrend && latestOilInfo.manualUpdate === dateOrigin) {
-                isManual = true;
-                trend = latestOilInfo.manualTrend;
-                amount = latestOilInfo.manualAmount;
-                newsUrl = null;
-            }
-            const trendText = getTrendText(trend);
-            const adjustmentExpected = `${trendText}${amount ? ' ' + amount : ''}`;
-            summary = `油价调整预期：${adjustmentExpected}`;
-            description = `调整预期：${adjustmentExpected}\n调整日期：${dateOrigin}`;
-            if (isManual) {
-                description += `\n来源：手动设置`;
-            } else if (newsUrl) {
-                description += `\n来源：查看详细 ${newsUrl}`;
-            }
+        // 只处理最近一次和其余未来日期
+        const firstDate = futureDates[0];
+        const dateOrigin = firstDate.date;
+        let isManual = false;
+        let trend = latestOilInfo.lastTrend;
+        let amount = latestOilInfo.lastAmount;
+        let newsUrl = latestOilInfo.lastNewsUrl;
+        if (latestOilInfo.manualTrend && latestOilInfo.manualUpdate === dateOrigin) {
+            isManual = true;
+            trend = latestOilInfo.manualTrend;
+            amount = latestOilInfo.manualAmount;
+            newsUrl = null;
+        }
+        const trendText = getTrendText(trend);
+        const adjustmentExpected = `${trendText}${amount ? ' ' + amount : ''}`;
+        let description = `调整预期：${adjustmentExpected}\n调整日期：${dateOrigin}`;
+        if (isManual) {
+            description += `\n来源：手动设置`;
+        } else if (newsUrl) {
+            description += `\n来源：查看详细 ${newsUrl}`;
+        }
+        calendar.createEvent({
+            start: parseICalDateTime(`${dateOrigin} 16:00:00`),
+            end: parseICalDateTime(`${dateOrigin} 16:00:00`).add(1, 'hour'),
+            summary: `油价调整预期：${adjustmentExpected}`,
+            description,
+            url: 'https://example.com/oil-price',
+            categories: [{ name: '油价调整' }],
+            timezone: 'Asia/Shanghai'
+        });
+        // 其余未来日期全部为"待预测"
+        for (let i = 1; i < futureDates.length; i++) {
+            const d = futureDates[i];
             calendar.createEvent({
-                start: eventStart,
-                end: eventEnd,
-                summary,
-                description,
+                start: parseICalDateTime(`${d.date} 16:00:00`),
+                end: parseICalDateTime(`${d.date} 16:00:00`).add(1, 'hour'),
+                summary: `油价调整预期：待预测`,
+                description: `调整预期：待预测\n调整日期：${d.date}`,
                 url: 'https://example.com/oil-price',
                 categories: [{ name: '油价调整' }],
                 timezone: 'Asia/Shanghai'
             });
-        });
+        }
     }
-
     return calendar;
 }
 
